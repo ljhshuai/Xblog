@@ -1,0 +1,55 @@
+<%- include header.ejs %>
+<%- include alert.ejs %>
+
+		<div class="container">
+			<div class="row" >
+				<div class="col-lg-4 col-lg-pull-1" id="userinfo">		
+					<div class="row">
+						<div class="col-lg-4 col-lg-offset-5">
+							<a href="/u/<%= user.name %>">
+								<img src="../images/defalut.jpg" alt="header" class="img-responsive img-circle" />
+							</a>
+						</div>
+					</div>	
+					<div class="row">
+						<div class="col-lg-4 col-lg-offset-5 text-center">
+							<a href="/u/<%= user.name%>"><h3><%= user.name %></h3></a>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-7 col-lg-push-5 tag">
+							<span>关注 <%= user.followings %></span>
+							<span>粉丝 <%= user.followers %></span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-8 col-lg-push-4 tag">
+							<span>文章 <%= user.posts %></span>
+							<span>字数 <%= user.words %></span>
+							<span>获赞 <%= user.goods %></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-8 col-lg-pull-1">
+					<div class="row"  id="posts">
+						<%- include postsimple.ejs %>
+					</div>
+					<div class="row">
+						<nav class="pull-right">
+						  <ul class="pagination">
+						    <li><a href="#">&laquo;</a></li>
+						    <li><a href="#">1</a></li>
+						    <li><a href="#">2</a></li>
+						    <li><a href="#">3</a></li>
+						    <li><a href="#">4</a></li>
+						    <li><a href="#">5</a></li>
+						    <li><a href="#">&raquo;</a></li>
+						  </ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+		</div>
+
+<%- include footer.ejs %>

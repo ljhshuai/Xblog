@@ -1,0 +1,38 @@
+<%- include header.ejs %>
+<%- include alert.ejs %>
+
+		<div id="text" class="container-fluid">
+			<form id="form2" class="form-horizontal"  method="POST" action="/postmd">
+					<div class="row">
+						<div class="col-lg-6" id="show">	
+							<div class="input-group" >
+							<input type="text" id="title" class="form-control input-lg" name="title" placeholder="文章标题" />
+							<span class="input-group-btn">
+								<button type="submit" class="btn-lg btn-info ">发表</button>
+							</span>
+							</div>
+							<!--没想好怎么弄-->
+							<textarea  rows="1000" id="content" class="form-control" name="content" placeholder="内容"></textarea>
+						</div>
+						
+						<div class="col-lg-6">	
+							<div id="titleResult"></div>
+							<div id="contentResult"></div>
+						</div>
+					</div>
+			</form>	
+		</div>
+
+		<script>			
+			$("#title").keyup(function() {
+			   document.getElementById("titleResult").innerHTML = '<h1>' + $(this).val() + '</h1>'
+			});
+			$("#content").keyup(function() {
+			   var $content = $(this).val();
+			   var converter = new showdown.Converter();
+			   var html = converter.makeHtml($content);
+			   document.getElementById('contentResult').innerHTML = html;
+			});
+		</script>	
+
+<%- include footer.ejs %>

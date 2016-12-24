@@ -1,0 +1,24 @@
+<%- include header.ejs %>
+<%- include alert.ejs %>
+
+	<div class="container" style="background: lightgrey; padding: 10px 100px;">
+		<div class="row text-center">
+				<h1><%= post.title %></h1>							
+		</div>
+		<div class="row text-center">
+			<a href="<%= post.username %>"><h3><%= post.username %></h3></a>
+		</div>
+		<div style=" font-size:x-large; text-indent:50px; border: 1px solid grey;">
+			<text>
+				<%- post.content %>
+			</text>
+		</div>
+		<div class="row">
+			<div class="pull-right">
+				<%= post.time %>
+			</div>
+		</div>					
+	</div>
+
+
+<%- include footer.ejs %>

@@ -1,0 +1,88 @@
+#loginform div, #regform div {
+	margin-top: 20px;
+}
+
+div.button-group {
+	margin-top: 40px;
+	margin-bottom: 10px;
+}
+
+#logoh1{
+	font-size: 80px;
+}
+
+.tag a {
+	margin-left: 10px;
+}
+
+.tag {
+	margin-top: 20px;
+}
+
+#userimg {
+	height: 40px; 
+	width: 40px;
+	position: relative; 
+	top: -10px;
+}
+#userinfo {
+	height: 400px;
+}
+
+#title{
+	font-size: xx-large;	
+}
+
+#content {
+	font-size: x-large;
+}
+
+#editor {
+	width: 100%;
+	height: 500px;
+}
+
+#text {
+	background-color: lightgrey;
+}
+
+#show {
+	border-right: 1px solid lightgrey;
+}
+
+#text div {
+	padding: 0;
+}
+
+#posts {
+	 height: 535px;
+	 overflow: hidden;
+}
+
+.postdiv {
+	background: lightgrey;
+	padding-left: 40px;  
+	height: 130px;
+	margin-bottom: 5px;
+}
+
+.posttitle {
+	height: 50px;
+	overflow: hidden;
+}
+
+.postcontent {
+	height: 50px;
+	overflow: hidden;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.posttime {
+	height: 20px;
+	overflow: hidden;
+	margin-right: 10px;
+}
+
+
+

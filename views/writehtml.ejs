@@ -1,0 +1,27 @@
+<%- include header.ejs %>
+<%- include alert.ejs %>
+
+<div class="container">
+			<form class="form-horizontal" method="POST" action='/posthtml'>
+				<div class="form-group">
+					<input type="text" class="form-control" name="title" placeholder="文章标题"/>
+				</div>
+				<div class="form-group">
+					<textarea id="editor" name="content"></textarea>					
+				</div>
+		
+				<div class="form-group">
+					<button type="submit" class="btn btn-info pull-right">发表</button>
+				</div>
+			</form>
+</div>
+
+<script type="text/javascript">
+	<!--富文本编辑器增加工具条-->
+   	window.onload = function () {
+        var editor = new wangEditor('editor');
+        editor.create();
+    };
+</script>
+
+<%- include footer.ejs %>
