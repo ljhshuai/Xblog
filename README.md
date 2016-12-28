@@ -11,7 +11,7 @@ node入门博客实例增强功能
 
 功能描述：
 
-注册、登录、发表文章、评论、点赞、首页浏览文章、用户上传头像、支持markdown编辑
+注册邮箱验证、登录、发表文章、评论、点赞、首页浏览文章、用户上传头像、支持markdown编辑
 
 上述功能还有一些没有实现,后续会增加进来
 
@@ -22,7 +22,7 @@ node入门博客实例增强功能
 在根目录新建setting.js
 
 输入如下内容：
-
+```js
 module.exports = {
 	cookieSecret: "自己设置的cookie密钥",
 	qqmail: {
@@ -30,7 +30,7 @@ module.exports = {
 		password: "qq邮箱smtp服务密码不是登录密码"
 	}
 };
-
+```
 保存后退出执行如下命令
 
 npm install
@@ -38,3 +38,4 @@ npm install
 npm start app.js
 
 访问localhost:2000即可
+其中端口可以在/bin/www文件中更改
