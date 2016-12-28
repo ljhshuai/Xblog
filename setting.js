@@ -1,5 +1,7 @@
 module.exports = {
 	cookieSecret: "xblog",
-	db: "xblog",
-	host: "localhost"
+	qqmail: {
+		user: "1312533774@qq.com",
+		password: "oslvxeshqwdlbaba"
+	}
 };

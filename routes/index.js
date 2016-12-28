@@ -4,7 +4,18 @@ var crypto = require('crypto');
 var User = require('../models/user');
 var Post = require('../models/post');
 var showdown = require('showdown');//处理markdown所需模块
+var nodemailer = require('nodemailer');
+var setting = require('../setting');
 
+var mailTransport = nodemailer.createTransport('SMTP', {
+	host: "smtp.qq.com",        // 主机
+  secureConnection : true,    // 使用 SSL
+  port: 465,                  // SMTP 端口
+  auth: {
+    user: setting.qqmail.user,
+    pass: setting.qqmail.password
+  }
+});
 //首页请求处理
 router.get('/', function(req, res) {
   //读取所有的用户微博，传递把posts微博数据集传给首页
@@ -36,12 +47,16 @@ router.post('/reg', function(req, res) {
 		account: req.body.account,
 		name: req.body.username,
 		password: password,
+		active: 0,
+		activeWord: Math.floor((Math.random() * 1000000)),
 		followings: 0,
 		followers: 0,
 		posts: 0,
 		words: 0,
 		goods: 0
 	});
+	//生成验证邮箱链接
+	var activeLink = 'localhost\:2000/confirm/' + newUser.name + '/' + newUser.activeWord; 
 	//检测用户是否存在
 	User.get(newUser.account, newUser.name, function(err, user) {
 		if (user) {
@@ -60,10 +75,43 @@ router.post('/reg', function(req, res) {
           req.flash('error', err);
           return res.redirect('/reg');
       }
-      req.session.user = newUser;//保存用户名，用于判断用户是否已登录
-      req.flash('success', '注册成功');
-      return res.redirect('/');
+      
+      mailTransport.sendMail({
+      	from: '1312533774@qq.com',
+      	to: newUser.account,
+      	subject: '欢迎注册Xblog',
+      	html: '<h1>点击下方链接完成验证</h1><a href="' + activeLink + '">' + activeLink + '</a>'
+      }, function(err) {
+      	if (err) {
+      		console.log(err);
+      	}
+      });
+      req.flash('success', '请查收验证邮件,没有的话去垃圾箱翻一翻');
+      return res.redirect('/login');     
     });
+	});
+});
+
+//验证邮箱
+router.get('/confirm/:user/:word', function(req, res) {
+	User.get(req.params.user, function(err, user) {
+		if (!user) {
+			return res.redirect('/');
+		}
+		//req.params.word是number类型
+		if (user.activeWord == req.params.word) {
+			user.active = 1;
+			
+			user.update(function(err) {
+				if (err) {
+			    req.flash('error', err);
+			    return res.redirect('/');    
+			  }	else {
+			  	req.flash('success', '邮箱验证成功');
+					return res.redirect('/login');
+			  }
+			});			
+		} 
 	});
 });
 
@@ -85,6 +133,10 @@ router.post('/login', function(req, res) {
 	User.get(req.body.account, function(err, user) {
 		if (!user) {
 			req.flash('error', '用户不存在');
+			return res.redirect('/login');
+		}
+		if (!user.active) {
+			req.flash('error', '未验证邮箱');
 			return res.redirect('/login');
 		}
 		if (user.password === password) {
@@ -189,9 +241,9 @@ router.post('/postmd', function(req, res) {
   });
 });
 
-router.get('/p/:time', function(req, res) {
-	//暂时采用time查询,使用_id查询好像键值对的值不能是变量,还在学习
-	Post.search(req.params.time, function(err, post) {
+router.get('/p/:id', function(req, res) {
+	//使用_id来查询post
+	Post.search(req.params.id, function(err, post) {
 		if (err) {
 			req.flash('error', err);
 			return res.redirect('/');
