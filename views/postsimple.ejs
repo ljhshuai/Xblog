@@ -2,7 +2,7 @@
 	<% posts.forEach(function(post) { %>
 		<div class="container-fluid postdiv">
 			<div class="row posttitle">
-				<a href="/p/<%= post.time %>"><h3><%= post.title %></h3></a>	
+				<a href="/p/<%= post._id %>"><h3><%= post.title %></h3></a>	
 			</div>
 			<div class="row postcontent">
 				<%- post.brief %>

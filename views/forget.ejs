@@ -1,0 +1,36 @@
+<%- include header.ejs %>
+<%- include alert.ejs %>
+
+<div class="container">
+			<!--logo开始-->
+			<div class="col-lg-4 col-lg-offset-4 text-center">
+				<h1 id="logoh1" class="text-info"><i>X</i>blog</h1>
+				<h3 class="text-info">享你所想</h3>
+			</div>
+			<!--logo结束-->
+			<!--表单开始-->
+			<div class="col-lg-4 col-lg-offset-4">
+				<form method="POST" action="/forget" id="forgetform" class="form-horizontal form-group-lg">					
+					<div class="input-group">
+						<span class=" input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+						<input type="email" name="account" placeholder="注册时电子邮箱" class="form-control" />
+					</div>
+					<div class="input-group">
+						<span class=" input-group-addon"><span class="glyphicon glyphicon-off"></span></span>
+						<input type="password" name="password" placeholder="新密码" class="form-control" />		
+					</div>
+					<div class="input-group">
+						<span class=" input-group-addon"><span class="glyphicon glyphicon-off"></span></span>
+						<input type="password" name="repeatpsw" placeholder="确认密码" class="form-control" />		
+					</div>
+							
+					<div class="button-group">
+						<button type="submit" class="btn btn-info  form-control active">确认</button>
+					</div
+					
+				</form>
+			</div>	
+			<!--表单结束-->
+		</div>
+
+<%- include footer.ejs %>

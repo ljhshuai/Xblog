@@ -4,7 +4,18 @@ var crypto = require('crypto');
 var User = require('../models/user');
 var Post = require('../models/post');
 var showdown = require('showdown');//处理markdown所需模块
+var nodemailer = require('nodemailer');
+var setting = require('../setting');
 
+var mailTransport = nodemailer.createTransport('SMTP', {
+	host: "smtp.qq.com",        // 主机
+  secureConnection : true,    // 使用 SSL
+  port: 465,                  // SMTP 端口
+  auth: {
+    user: setting.qqmail.user,
+    pass: setting.qqmail.password
+  }
+});
 //首页请求处理
 router.get('/', function(req, res) {
   //读取所有的用户微博，传递把posts微博数据集传给首页
@@ -36,12 +47,16 @@ router.post('/reg', function(req, res) {
 		account: req.body.account,
 		name: req.body.username,
 		password: password,
+		active: 0,
+		activeWord: Math.floor((Math.random() * 1000000)),
 		followings: 0,
 		followers: 0,
 		posts: 0,
 		words: 0,
 		goods: 0
 	});
+	//生成验证邮箱链接
+	var activeLink = 'localhost\:2000/confirm/' + newUser.name + '/' + newUser.activeWord; 
 	//检测用户是否存在
 	User.get(newUser.account, newUser.name, function(err, user) {
 		if (user) {
@@ -60,10 +75,43 @@ router.post('/reg', function(req, res) {
           req.flash('error', err);
           return res.redirect('/reg');
       }
-      req.session.user = newUser;//保存用户名，用于判断用户是否已登录
-      req.flash('success', '注册成功');
-      return res.redirect('/');
+      
+      mailTransport.sendMail({
+      	from: '1312533774@qq.com',
+      	to: newUser.account,
+      	subject: '欢迎注册Xblog',
+      	html: '<h1>点击下方链接完成验证</h1><a href="' + activeLink + '">' + activeLink + '</a>'
+      }, function(err) {
+      	if (err) {
+      		console.log(err);
+      	}
+      });
+      req.flash('success', '请查收验证邮件,没有的话请检查垃圾箱');
+      return res.redirect('/login');     
     });
+	});
+});
+
+//验证邮箱
+router.get('/confirm/:user/:word', function(req, res) {
+	User.get(req.params.user, function(err, user) {
+		if (!user) {
+			return res.redirect('/');
+		}
+		//req.params.word是number类型
+		if (user.activeWord == req.params.word) {
+			user.active = 1;
+			
+			user.update(function(err) {
+				if (err) {
+			    req.flash('error', err);
+			    return res.redirect('/');    
+			  }	else {
+			  	req.flash('success', '邮箱验证成功');
+					return res.redirect('/login');
+			  }
+			});			
+		} 
 	});
 });
 
@@ -87,6 +135,12 @@ router.post('/login', function(req, res) {
 			req.flash('error', '用户不存在');
 			return res.redirect('/login');
 		}
+		if (!user.active) {
+			req.flash('error', '未验证邮箱');
+			return res.redirect('/login');
+		}
+		console.log(password);
+		console.log(user.password);
 		if (user.password === password) {
 			req.flash('success', '登录成功');
 			//使用session记录当前登录用户
@@ -97,6 +151,73 @@ router.post('/login', function(req, res) {
 			return res.redirect('/login');
 		}
 	});	
+});
+
+//忘记密码请求处理
+router.get('/forget', function(req, res) {
+	res.render('forget', {title: '忘记密码'});
+});
+
+router.post('/forget', function(req, res) {
+	//简单的表单验证,后续再增强
+	if (req.body.account === '' || req.body.password === '' || req.body.repeatpsw === '') {
+		req.flash('error', '输入框不能为空');
+		return res.redirect('/forget');
+	}
+	if (req.body.password !== req.body.repeatpsw) {
+		req.flash('error', '两次输入密码不一致');
+		return res.redirect('/forget');
+	}
+	//检测是否存在该邮箱账号
+	User.get(req.body.account, function(err, user) {
+		//密码加密后得到要更改的新密码
+		var md5 = crypto.createHash('md5');
+		var password = md5.update(req.body.password).digest('base64');
+		//将用户账号和新密码生成链接,这里应该仍使用注册时的验证码
+		var newpswLink = 'localhost\:2000/newpsw/' + user.name + '/' + user.activeWord + '/' + password;
+		if (!user) {
+			req.flash('error', '无此邮箱账号');
+			return res.redirect('/forget');
+		}
+		//存在账号则发送邮件
+		mailTransport.sendMail({
+      	from: '1312533774@qq.com',
+      	to: req.body.account,
+      	subject: '忘记密码Xblog',
+      	html: '<h1>点击下方链接完成更改密码</h1><a href="' + newpswLink + '">' + newpswLink + '</a>'
+      }, function(err) {
+      	if (err) {
+      		console.log(err);
+      	}
+    });
+    req.flash('success', '请验证邮件以完成密码重置,未收到请检查垃圾箱');
+    return res.redirect('/login');      
+	});
+});
+
+//处理来自更改密码邮件的链接请求
+router.get('/newpsw/:user/:word/:password', function(req, res) {
+	//由链接中的用户名来查找账户
+	User.get(req.params.user, function(err, user) {
+		if (!user) {
+			req.flash('error', '用户不存在');
+			return res.redirect('/');
+		}
+		if (req.params.word == user.activeWord && req.params.password !== '') {
+			//验证activeWord并更改密码
+			user.password = '' + req.params.password;
+			//更新数据库用户信息
+			user.update(function(err) {
+				if (err) {
+			    req.flash('error', err);
+			    return res.redirect('/');    
+			  }	else {
+			  	req.flash('success', '密码重置成功');
+					return res.redirect('/login');
+			  }
+			});			
+		}
+	})
 });
 
 //用户主页请求处理
@@ -189,9 +310,9 @@ router.post('/postmd', function(req, res) {
   });
 });
 
-router.get('/p/:time', function(req, res) {
-	//暂时采用time查询,使用_id查询好像键值对的值不能是变量,还在学习
-	Post.search(req.params.time, function(err, post) {
+router.get('/p/:id', function(req, res) {
+	//使用_id来查询post
+	Post.search(req.params.id, function(err, post) {
 		if (err) {
 			req.flash('error', err);
 			return res.redirect('/');

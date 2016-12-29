@@ -1,4 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
+
 var assert = require('assert');
 
 //数据库url
@@ -9,6 +10,10 @@ function User(user) {
 	this.account = user.account;
 	this.name = user.name;
 	this.password = user.password;
+	//账号是否被激活
+	this.active = user.active;
+	//激活码
+	this.activeWord = user.activeWord;
 	//关注粉丝文章字数赞
 	this.followings = user.followings;
 	this.followers = user.followers;	
@@ -27,6 +32,8 @@ User.prototype.save = function save(callback) {
 		account: this.account,
 		name: this.name,
 		password: this.password,
+		active: this.active,
+		activeWord: this.activeWord,
 		followings: this.followings,
 		followers: this.followers,
 		posts: this.posts,
@@ -60,6 +67,8 @@ User.prototype.update = function update(callback) {
 		account: this.account,
 		name: this.name,
 		password: this.password,
+		active: this.active,
+		activeWord: this.activeWord,
 		followings: this.followings,
 		followers: this.followers,
 		posts: this.posts,

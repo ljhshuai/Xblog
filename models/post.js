@@ -1,4 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectId;
 var assert = require('assert');
 
 // Connection URL
@@ -58,6 +59,7 @@ Post.prototype.save = function save(callback) {
 Post.prototype.update = function update(callback) {
 	//存入mongodb中的文档
 	var post = {
+		_id: this._id,
 		username: this.username,
 		title: this.title,
 		brief: this.brief,
@@ -110,6 +112,7 @@ Post.get = function get(username, callback) {
 				var posts = [];
 				docs.forEach(function(doc, index) {
 					var post = {
+						_id: doc._id,
 						username: doc.username,
 						title: doc.title,
 						brief: doc.brief,
@@ -124,8 +127,8 @@ Post.get = function get(username, callback) {
 	});
 };
 
-//根据时间查询文章,不合理,后续改进
-Post.search = function search(time, callback) {
+//查询文章
+Post.search = function search(id, callback) {
 	MongoClient.connect(url, function(err, db) {
 		assert.equal(null, err);
 
@@ -135,14 +138,15 @@ Post.search = function search(time, callback) {
 				db.close();
 				return callback(err);
 			}
-			//按时间查找文章
-			collection.findOne({"time": time}, function(err, doc) {				
+			//按_id查找文章
+			collection.findOne({"_id": ObjectId(id)}, function(err, doc) {				
 				db.close();
 				if (err) {
 					callback(err, null);
 				}
 				//实例化返回的post
 				var post = {
+					_id: doc._id,
 					username: doc.username,
 					title: doc.title,
 					content: doc.content,
