@@ -116,6 +116,7 @@ router.get('/confirm/:user/:word', function(req, res) {
 });
 
 //登录请求处理
+router.get('/login', checkNotLogin);
 router.get('/login', function(req, res) {
 	res.render('login', {title: '用户登录'});
 });
@@ -154,6 +155,7 @@ router.post('/login', function(req, res) {
 });
 
 //忘记密码请求处理
+router.get('/forget', checkNotLogin);
 router.get('/forget', function(req, res) {
 	res.render('forget', {title: '忘记密码'});
 });
@@ -221,6 +223,7 @@ router.get('/newpsw/:user/:word/:password', function(req, res) {
 });
 
 //用户主页请求处理
+router.get('/u/:user', checkLogin);
 router.get('/u/:user', function(req, res) {
 	//根据请求中的参数获取user
 	User.get(req.params.user, function(err, user) {
@@ -241,6 +244,7 @@ router.get('/u/:user', function(req, res) {
 });
 
 //用户写文章请求处理,富文本编辑器
+router.get('/writehtml', checkLogin);
 router.get('/writehtml', function(req, res) {
   res.render('writehtml', { title: '写文章' });
 });
@@ -275,6 +279,7 @@ router.post('/posthtml', function(req, res) {
 
 //用户写文章请求处理,markdown编辑器,显示文章详情时支持不好
 //不能自动换行,后续再完善
+router.get('/writemd', checkLogin);
 router.get('/writemd', function(req, res) {
   res.render('writemd', { title: '写文章' });
 });
@@ -322,6 +327,7 @@ router.get('/p/:id', function(req, res) {
 });
 
 //登出请求处理
+router.get('/logout', checkLogin);
 router.get('/logout', function(req, res) {
 	//将session中用户清除
 	req.session.user = null;
@@ -329,5 +335,20 @@ router.get('/logout', function(req, res) {
 	res.redirect('/');
 });
 
+//检测是否登录
+function checkLogin(req, res, next) {
+	if (!req.session.user) {
+		req.flash('error', '未登入');
+		return res.redirect('/login');
+	}
+	next();
+}
+function checkNotLogin(req, res, next) {
+	if (req.session.user) {
+		req.flash('error', '已登入');
+		return res.redirect('/');
+	}
+	next();
+}
 //导出router模块
 module.exports = router;
